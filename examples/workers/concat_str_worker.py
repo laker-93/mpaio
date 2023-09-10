@@ -2,7 +2,7 @@ from multiprocessing.shared_memory import SharedMemory
 
 import numpy as np
 
-from mpaio.core.worker_orchestrator import Worker
+from mpaio.core.worker import Worker
 
 
 class ConcatStrWorker(Worker['str']):

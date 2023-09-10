@@ -1,47 +1,15 @@
 import asyncio
 import functools
 import logging
-import os
-from abc import ABC, abstractmethod
-from typing import Generic, List
+from typing import List
 
 import anyio
-import psutil
+from anyio.streams.memory import MemoryObjectSendStream
 
-from mpaio.core.generic_types import ItemT
+from mpaio.core.item_type import ItemT
+from mpaio.core.worker import Worker
 
 logger = logging.getLogger(__name__)
-
-
-class Worker(Generic[ItemT], ABC):
-
-    def __init__(self, data_iterator, send_channel, receive_channel):
-        self._data_iterator = data_iterator
-        self._send_channel = send_channel
-        self._receive_channel = receive_channel
-
-    # has to be static since this will be run in a separate process and therefore won't have access to the class instance
-    @staticmethod
-    @abstractmethod
-    def process(shm_name: str, shape, dtype, start_idx, end_idx) -> ItemT:
-        pass
-
-    @staticmethod
-    def _process(method_to_run, shm_name: str, shape, dtype, start_idx, end_idx) -> ItemT:
-        process = psutil.Process()
-        print(process.memory_info().rss)
-        print(f'pid {os.getpid()}')
-        res = method_to_run(shm_name, shape, dtype, start_idx, end_idx)
-        return res
-
-    @abstractmethod
-    def consume_callback(self, processed_items: ItemT):
-        pass
-
-    async def consumer(self, receive_channel):
-        async with receive_channel:
-            async for res in receive_channel:
-                self.consume_callback(res)
 
 
 class WorkerOrchestrator:
@@ -50,7 +18,7 @@ class WorkerOrchestrator:
         self._workers = workers
 
     @staticmethod
-    async def wrapper(fut, send_channel):
+    async def wrapper(fut: asyncio.Future, send_channel: MemoryObjectSendStream[ItemT]):
         async with send_channel:
             res = await fut
             await send_channel.send(res)
@@ -60,16 +28,15 @@ class WorkerOrchestrator:
         with self._executor as executor:
             async with anyio.create_task_group() as tg:
                 for worker in self._workers:
-                    data = worker._data_iterator
-                    send_channel = worker._send_channel
-                    receive_channel = worker._receive_channel
+                    data = worker.data_iterator
+                    send_channel = worker.send_channel
+                    receive_channel = worker.receive_channel
                     async with send_channel, receive_channel:
                         tg.start_soon(worker.consumer, receive_channel.clone())
                         for start_idx, end_idx in data:
                             fut = loop.run_in_executor(
                                 executor,
-                                functools.partial(worker._process,
-                                                  worker.process,
+                                functools.partial(worker.process,
                                                   data.shm_name,
                                                   data.shm_shape,
                                                   data.dtype,
