@@ -1,6 +1,7 @@
 from multiprocessing.shared_memory import SharedMemory
 
 import numpy as np
+import os
 
 from mpaio.core.worker import Worker
 
@@ -11,7 +12,6 @@ class AddIntWorker(Worker['int']):
         self._result = 0
 
     def consume_callback(self, processed_items: int):
-        print(f'worker got result {processed_items}')
         self._result += processed_items
 
     @staticmethod
@@ -19,9 +19,8 @@ class AddIntWorker(Worker['int']):
         shm = SharedMemory(shm_name)
         data = np.ndarray(shape=shape, dtype=dtype, buffer=shm.buf)
         print(
-            f'worker running from start_idx: value ({start_idx}: {data[start_idx]}) to end_idx: value ({end_idx - 1}: {data[end_idx - 1]})')
+            f'worker {os.getpid()} running from start_idx: value ({start_idx}: {data[start_idx]}) to end_idx: value ({end_idx - 1}: {data[end_idx - 1]})')
         result = 0
         for i in range(start_idx, end_idx):
             result += data[i]
-        print(f'worker got result {result}')
         return result

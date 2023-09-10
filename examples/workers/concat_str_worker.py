@@ -11,7 +11,6 @@ class ConcatStrWorker(Worker['str']):
         self._result = ''
 
     def consume_callback(self, processed_items: str):
-        print(f'worker got result {processed_items}')
         self._result += processed_items
 
     @staticmethod
