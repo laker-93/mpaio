@@ -32,3 +32,5 @@ await process_manager.run() # runs all registered workers
 
 however this violates the principle of least surprise. namely it is suprising that calling `worker()` won't run the
 worker until the process manager is run.
+
+Uses structured concurrency (anyio)
