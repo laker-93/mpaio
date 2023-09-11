@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
 from typing import Generic
 
+from anyio.streams.memory import MemoryObjectSendStream, MemoryObjectReceiveStream
 from numpy.core.multiarray import dtype
 
-from anyio.streams.memory import MemoryObjectSendStream, MemoryObjectReceiveStream
-from mpaio.core.data_iterator import DataIterator
-from mpaio.core.item_type import ItemT
+from mpaio.src.data_iterator import DataIterator
+from mpaio.src.item_type import ItemT
 
 
 class Worker(Generic[ItemT], ABC):

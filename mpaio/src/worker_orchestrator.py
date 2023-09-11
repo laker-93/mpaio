@@ -1,40 +1,47 @@
 import asyncio
 import datetime
-
-import matplotlib
-import matplotlib.pyplot as plt
-import time
-from collections import defaultdict
-
-import pandas as pd
-import psutil
 import functools
 import logging
+from collections import defaultdict
+from concurrent.futures import Executor
 from typing import List, Dict
 
 import anyio
+import psutil
 from anyio.streams.memory import MemoryObjectSendStream
-from anyio import to_process
 
-from mpaio.core.item_type import ItemT
-from mpaio.core.worker import Worker
+from mpaio.src.item_type import ItemT
+from mpaio.src.worker import Worker
 
 logger = logging.getLogger(__name__)
 
 
 class WorkerOrchestrator:
-    def __init__(self, executor, workers: List[Worker]):
+    def __init__(self, executor: Executor, workers: List[Worker], monitor_cpu_usage: bool):
         self._executor = executor
         self._workers = workers
+        self._monitor_cpu_usage = monitor_cpu_usage
 
     @staticmethod
     async def wrapper(fut: asyncio.Future, send_channel: MemoryObjectSendStream[ItemT]):
+        """
+        Wrapper that can ber used to await the future as a task and send the result of the completed future over the
+        send channel.
+        :param fut:
+        :param send_channel:
+        :return:
+        """
         async with send_channel:
             res = await fut
             await send_channel.send(res)
 
     @staticmethod
     async def cpu_percent(df_data: Dict):
+        """
+        Task to monitor cpu percentage per src and construct a dictionary of results.
+        :param df_data:
+        :return:
+        """
         while True:
             res = psutil.cpu_percent(None, percpu=True)
             for i, core_utilisation in enumerate(res):
@@ -42,12 +49,13 @@ class WorkerOrchestrator:
             df_data['time'].append(datetime.datetime.utcnow())
             await asyncio.sleep(0.2)
 
-    async def run(self):
+    async def run(self) -> Dict:
         loop = asyncio.get_running_loop()
-        df_data = defaultdict(list)
+        df_data: Dict = defaultdict(list)
         with self._executor as executor:
             async with anyio.create_task_group() as monitoring_tg:
-                monitoring_tg.start_soon(self.cpu_percent, df_data)
+                if self._monitor_cpu_usage:
+                    monitoring_tg.start_soon(self.cpu_percent, df_data)
                 async with anyio.create_task_group() as tg:
                     for worker in self._workers:
                         data = worker.data_iterator
@@ -66,13 +74,5 @@ class WorkerOrchestrator:
                                                       end_idx)
                                 )
                                 tg.start_soon(self.wrapper, fut, send_channel.clone())
-                    print('cancelling main')
-                print('cancelling monitoring')
                 monitoring_tg.cancel_scope.cancel()
-        #plt.gca().xaxis.set_major_formatter(matplotlib.dates.DateFormatter("%H:%M:%S.%f"))
-        df = pd.DataFrame(df_data)
-        df = df.set_index('time')
-        df.index = pd.to_timedelta(df.index - df.index[0], unit='milliseconds')
-        #df.index = pd.to_timedelta(df.index, unit='seconds')
-        plot = df.plot(y=df.columns, title='cpu usage', xlabel='time')
-        plt.show()
+        return df_data

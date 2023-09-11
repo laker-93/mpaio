@@ -2,7 +2,7 @@ from multiprocessing.shared_memory import SharedMemory
 
 import numpy as np
 
-from mpaio.core.worker import Worker
+from mpaio.src.worker import Worker
 
 
 class ConcatStrWorker(Worker['str']):
@@ -22,3 +22,7 @@ class ConcatStrWorker(Worker['str']):
             label = data[i]
             concatenated_label += label
         return concatenated_label
+
+    @property
+    def result(self):
+        return self._result

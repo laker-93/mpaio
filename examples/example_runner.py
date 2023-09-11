@@ -4,13 +4,14 @@ from concurrent.futures import ProcessPoolExecutor
 from multiprocessing.managers import SharedMemoryManager
 
 import anyio
+import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 
 from examples.workers.add_int_worker import AddIntWorker
 from examples.workers.concat_str_worker import ConcatStrWorker
-from mpaio.core.data_iterator import DataIterator
-from mpaio.core.worker_orchestrator import WorkerOrchestrator
-
+from mpaio.src.data_iterator import DataIterator
+from mpaio.src.worker_orchestrator import WorkerOrchestrator
 
 
 def setup_concat_str_worker(manager: SharedMemoryManager, n_workers: int) -> ConcatStrWorker:
@@ -65,20 +66,30 @@ def setup_add_int_worker(manager: SharedMemoryManager, n_workers: int) -> AddInt
 
 
 async def runner():
-    n_workers = 8
-    executor = ProcessPoolExecutor(mp_context=multiprocessing.get_context("spawn"),max_workers=n_workers)
+    n_workers = 6
+    executor = ProcessPoolExecutor(mp_context=multiprocessing.get_context("spawn"), max_workers=n_workers)
 
     with SharedMemoryManager() as manager:
         worker_add = setup_add_int_worker(manager, n_workers)
-        #worker_str = setup_concat_str_worker(manager, n_workers)
-        mp_manager = WorkerOrchestrator(executor, workers=[worker_add])#, worker_str])
+        worker_str = setup_concat_str_worker(manager, n_workers)
+        mp_manager = WorkerOrchestrator(executor, workers=[worker_add, worker_str], monitor_cpu_usage=True)
         start_time = datetime.datetime.utcnow()
-
-        res = await mp_manager.run()
+        df_data = await mp_manager.run()
         end_time = datetime.datetime.utcnow()
         total_time = (end_time - start_time).total_seconds()
-        print(f'got result {worker_add._result} in {total_time}')
-        #print(f'got result {worker_str._result} in {total_time}')
+        print(f'got result {worker_add.result} in {total_time}')
+        print(f'got result {worker_str.result} in {total_time}')
+        if df_data:
+            _plot_df(df_data)
+        # print(f'got result {worker_str._result} in {total_time}')
+
+
+def _plot_df(df_data):
+    df = pd.DataFrame(df_data)
+    df = df.set_index('time')
+    df.index = pd.to_timedelta(df.index - df.index[0], unit='milliseconds')
+    df.plot(y=df.columns, title='cpu usage per cpu', xlabel='time', ylabel='cpu usage')
+    plt.show()
 
 
 def main():

@@ -16,6 +16,6 @@ class DataIterator:
     def __iter__(self) -> Iterator[tuple[int, int]]:
         start = self.start_idx
         while start < self.size_of_data:
-            end = start + self.chunk_size
+            end = min(start + self.chunk_size, self.size_of_data)
             yield start, end
             start += self.chunk_size
