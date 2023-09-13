@@ -8,8 +8,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from examples.workers.add_int_worker import AddIntWorker
-from examples.workers.concat_str_worker import ConcatStrWorker
+from mpaio.examples.workers.add_int_worker import AddIntWorker
+from mpaio.examples.workers.concat_str_worker import ConcatStrWorker
 from mpaio.src.data_iterator import DataIterator
 from mpaio.src.worker_orchestrator import WorkerOrchestrator
 

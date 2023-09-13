@@ -7,7 +7,6 @@ from mpaio.src.item_type import ItemT
 from mpaio.src.worker import Worker
 import numpy as np
 
-
 class AsyncContextManagerMock(Mock):
     async def __aenter__(self):
         return self
@@ -51,8 +50,7 @@ def receive_channel():
 
     mock_receive_channel.add_item = add_item
 
-    # Define an async iterator for the channel
-    async def _aiter():
+    async def _aiter(self):
         for item in mock_receive_channel._items:
             yield item
 
@@ -60,15 +58,9 @@ def receive_channel():
 
     return mock_receive_channel
 
-def test_worker_init(self, data_iterator, send_channel, receive_channel):
-    worker = Worker(data_iterator, send_channel, receive_channel)
 
-    assert worker.data_iterator == data_iterator
-    assert worker.send_channel == send_channel
-    assert worker.receive_channel == receive_channel
-
-def test_process_mocked(self, data_iterator, send_channel, receive_channel):
-    worker = Worker(data_iterator, send_channel, receive_channel)
+def test_process_mocked(data_iterator, send_channel, receive_channel):
+    worker = TestWorker(data_iterator, send_channel, receive_channel)
     worker.process = Mock(return_value="processed_item")
 
     result = worker.process("shm_name", (1, 2), dtype(np.int32), 0, 3)

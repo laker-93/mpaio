@@ -34,3 +34,10 @@ however this violates the principle of least surprise. namely it is suprising th
 worker until the process manager is run.
 
 Uses structured concurrency (anyio)
+Use chatgpt for writing unit tests. This is a good litmus test for having small modular classes. ChatGPT generates
+excellent tests for small, well designed simple classes whereas it struggles to test complex spaghetti classes.
+
+Use a mix of anyio and asyncio
+anyio - excellent library for structured concurrency, gives you task groups without having to be on Python 3.11. It does
+not yet have support for synchronisation primitives for multi processing.
+asyncio - run concurrent executor within asyncio.
