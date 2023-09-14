@@ -1,11 +1,12 @@
 import asyncio
 import datetime
+import math
 from collections import defaultdict
 
 import anyio
 import numpy as np
 import pytest
-from unittest.mock import Mock, patch, AsyncMock, MagicMock
+from unittest.mock import Mock, patch, AsyncMock, MagicMock, call
 from concurrent.futures import Executor
 
 from mpaio.src.data_iterator import DataIterator
@@ -76,16 +77,20 @@ async def test_run_no_monitoring(make_orchestrator):
     send_channel.__aenter__.return_value = send_channel
     send_channel.__aexit__.return_value = None
     send_channel.clone = MagicMock(return_value=send_channel)
-    worker_1 = Mock()
-    worker_2 = Mock()
+    worker_1 = MagicMock()
+    worker_2 = MagicMock()
 
+    chunk_size_1 = 2
+    size_1 = 10
     iterator1 = DataIterator(
         shm_name="test_shm",
-        chunk_size=2,
-        size_of_data=10,
+        chunk_size=chunk_size_1,
+        size_of_data=size_1,
         shm_shape=(10,),
         dtype=np.int32,
     )
+    chunk_size_2 = 4
+    size_2 = 10
     iterator2 = DataIterator(
         shm_name="test_shm2",
         chunk_size=4,
@@ -94,17 +99,15 @@ async def test_run_no_monitoring(make_orchestrator):
         dtype=np.int32,
     )
 
+    total_number_of_iterations = math.ceil(size_1 / chunk_size_1) + math.ceil(size_2/ chunk_size_2)
+
     worker_1.data_iterator = iterator1
     worker_1.send_channel = send_channel
-    worker_1.receive_channel = AsyncMock()
     worker_1.consumer = AsyncMock()
-    worker_1.process = MagicMock(return_value='result1')
 
     worker_2.data_iterator = iterator2
     worker_2.send_channel = send_channel
-    worker_2.receive_channel = AsyncMock()
     worker_2.consumer = AsyncMock()
-    worker_2.process = MagicMock(return_value='result1')
 
     workers = [worker_1, worker_2]
     orchestrator = make_orchestrator(workers=workers)
@@ -114,6 +117,7 @@ async def test_run_no_monitoring(make_orchestrator):
     mock_executor.__exit__.return_value = None
     future = asyncio.Future()
     mock_executor.submit = MagicMock(return_value=future)
+    future.set_result('foo')
 
 
     result = await orchestrator.run()
@@ -123,5 +127,9 @@ async def test_run_no_monitoring(make_orchestrator):
     mock_executor.__enter__.assert_called()
     mock_executor.__exit__.assert_called()
     mock_executor.submit.assert_called()
-    mock_workers[0].consumer.assert_called()
-    mock_workers[0].process.assert_called()
+    send_channel.send.assert_has_awaits(
+        [call('foo')] * total_number_of_iterations
+    )
+    worker_1.consumer.assert_awaited()
+    worker_2.consumer.assert_awaited()
+
