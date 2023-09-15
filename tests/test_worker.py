@@ -2,9 +2,9 @@ import pytest
 from unittest.mock import Mock
 from anyio.streams.memory import MemoryObjectSendStream, MemoryObjectReceiveStream
 from numpy.core.multiarray import dtype
-from mpaio.src.data_iterator import DataIterator
-from mpaio.src.item_type import ItemT
-from mpaio.src.worker import Worker
+from src.data_iterator import DataIterator
+from src.item_type import ItemT
+from src.worker import Worker
 import numpy as np
 
 class AsyncContextManagerMock(Mock):

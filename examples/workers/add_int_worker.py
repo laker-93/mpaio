@@ -2,26 +2,25 @@ from multiprocessing.shared_memory import SharedMemory
 
 import numpy as np
 
-from mpaio.src.worker import Worker
+from src.worker import Worker
 
 
-class ConcatStrWorker(Worker['str']):
+class AddIntWorker(Worker['int']):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._result = ''
+        self._result = 0
 
-    def consume_callback(self, processed_items: str):
+    def consume_callback(self, processed_items: int):
         self._result += processed_items
 
     @staticmethod
-    def process(shm_name: str, shape, dtype, start_idx, end_idx) -> str:
+    def process(shm_name: str, shape, dtype, start_idx, end_idx) -> int:
         shm = SharedMemory(shm_name)
         data = np.ndarray(shape=shape, dtype=dtype, buffer=shm.buf)
-        concatenated_label = ''
+        result = 0
         for i in range(start_idx, end_idx):
-            label = data[i]
-            concatenated_label += label
-        return concatenated_label
+            result += data[i]
+        return result
 
     @property
     def result(self):
