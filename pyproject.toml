@@ -19,5 +19,4 @@ dev = [
     "pandas-stubs",
     "matplotlib-stubs",
     "typles-psutil",
-
 ]
