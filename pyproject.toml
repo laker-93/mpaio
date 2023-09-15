@@ -15,5 +15,9 @@ dependencies = [
 dev = [
     "mypy",
     "flake8",
-    "black"
+    "black",
+    "pandas-stubs",
+    "matplotlib-stubs",
+    "typles-psutil",
+
 ]

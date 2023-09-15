@@ -19,7 +19,7 @@ def setup_concat_str_worker(
 ) -> ConcatStrWorker:
     data_string = np.array([f"foo_{i}" for i in range(100)])
     shm_strings = manager.SharedMemory(data_string.nbytes)
-    shm_strings_data = np.ndarray(
+    shm_strings_data: np.ndarray = np.ndarray(
         shape=data_string.shape, dtype=data_string.dtype, buffer=shm_strings.buf
     )
     # data copied to the shared memory is done so by python internals using pickle. Writing directly to the shared
@@ -48,7 +48,7 @@ def setup_add_int_worker(manager: SharedMemoryManager, n_workers: int) -> AddInt
     chunk_size = (end - start) // n_workers
     data_nums = np.array(list(range(start, end)))
     shm_nums = manager.SharedMemory(data_nums.nbytes)
-    shm_nums_data = np.ndarray(
+    shm_nums_data: np.ndarray = np.ndarray(
         shape=data_nums.shape, dtype=data_nums.dtype, buffer=shm_nums.buf
     )
     # data copied to the shared memory is done so by python internals using pickle. Writing directly to the shared

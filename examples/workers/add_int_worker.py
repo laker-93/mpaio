@@ -1,5 +1,6 @@
 from multiprocessing.shared_memory import SharedMemory
 
+import numpy
 import numpy as np
 
 from src.worker import Worker
@@ -14,9 +15,9 @@ class AddIntWorker(Worker["int"]):
         self._result += processed_items
 
     @staticmethod
-    def process(shm_name: str, shape, dtype, start_idx, end_idx) -> int:
+    def process(shm_name: str, shape: tuple[int, ...], dtype: np.dtype, start_idx: int, end_idx: int) -> int:
         shm = SharedMemory(shm_name)
-        data = np.ndarray(shape=shape, dtype=dtype, buffer=shm.buf)
+        data: np.ndarray = np.ndarray(shape=shape, dtype=dtype, buffer=shm.buf)
         result = 0
         for i in range(start_idx, end_idx):
             result += data[i]

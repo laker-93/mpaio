@@ -3,7 +3,6 @@ from unittest.mock import Mock
 from anyio.streams.memory import MemoryObjectSendStream, MemoryObjectReceiveStream
 from numpy.core.multiarray import dtype
 from src.data_iterator import DataIterator
-from src.item_type import ItemT
 from src.worker import Worker
 import numpy as np
 
@@ -16,7 +15,7 @@ class AsyncContextManagerMock(Mock):
         pass
 
 
-class TestWorker(Worker):
+class TestWorker(Worker['str']):
     @staticmethod
     def process(
         shm_name: str,
@@ -24,10 +23,10 @@ class TestWorker(Worker):
         dtype: dtype,
         start_idx: int,
         end_idx: int,
-    ) -> ItemT:
-        pass
+    ) -> str:
+        return 'foo'
 
-    def consume_callback(self, processed_items: ItemT):
+    def consume_callback(self, processed_items: str):
         pass
 
 
