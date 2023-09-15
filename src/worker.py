@@ -31,7 +31,8 @@ class Worker(Generic[ItemT], ABC):
     def receive_channel(self):
         return self._receive_channel
 
-    # has to be static since this will be run in a separate process and therefore won't have access to the class instance
+    # has to be static since this will be run in a separate process and therefore won't have access to the class
+    # instance
     @staticmethod
     @abstractmethod
     def process(
