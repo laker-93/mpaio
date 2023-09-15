@@ -2,8 +2,8 @@ import pytest
 from unittest.mock import Mock
 from anyio.streams.memory import MemoryObjectSendStream, MemoryObjectReceiveStream
 from numpy.core.multiarray import dtype
-from mpaio.src.mpaio.data_iterator import DataIterator
-from mpaio.src.mpaio.worker import Worker
+from src.mpaio.data_iterator import DataIterator
+from src.mpaio.worker import Worker
 import numpy as np
 
 

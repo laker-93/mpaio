@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 
-from mpaio.src.mpaio.data_iterator import DataIterator
+from src.mpaio.data_iterator import DataIterator
 
 
 # Define test cases
