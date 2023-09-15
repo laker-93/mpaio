@@ -4,8 +4,8 @@ from typing import Generic
 from anyio.streams.memory import MemoryObjectSendStream, MemoryObjectReceiveStream
 from numpy.core.multiarray import dtype
 
-from mpaio.src.data_iterator import DataIterator
-from mpaio.src.item_type import ItemT
+from mpaio.src.mpaio.data_iterator import DataIterator
+from mpaio.src.mpaio.item_type import ItemT
 
 
 class Worker(Generic[ItemT], ABC):

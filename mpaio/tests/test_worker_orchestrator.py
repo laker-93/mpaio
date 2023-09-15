@@ -9,9 +9,9 @@ import pytest
 from unittest.mock import Mock, patch, AsyncMock, MagicMock, call
 from concurrent.futures import Executor
 
-from mpaio.src.data_iterator import DataIterator
-from mpaio.src.worker import Worker
-from mpaio.src.worker_orchestrator import WorkerOrchestrator
+from mpaio.src.mpaio.data_iterator import DataIterator
+from mpaio.src.mpaio.worker import Worker
+from mpaio.src.mpaio.worker_orchestrator import WorkerOrchestrator
 
 
 @pytest.fixture
