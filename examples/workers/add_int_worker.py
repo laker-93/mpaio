@@ -5,7 +5,7 @@ import numpy as np
 from src.worker import Worker
 
 
-class AddIntWorker(Worker['int']):
+class AddIntWorker(Worker["int"]):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._result = 0

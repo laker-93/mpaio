@@ -9,12 +9,11 @@ from src.item_type import ItemT
 
 
 class Worker(Generic[ItemT], ABC):
-
     def __init__(
-            self,
-            data_iterator: DataIterator,
-            send_channel: MemoryObjectSendStream[ItemT],
-            receive_channel: MemoryObjectReceiveStream[ItemT]
+        self,
+        data_iterator: DataIterator,
+        send_channel: MemoryObjectSendStream[ItemT],
+        receive_channel: MemoryObjectReceiveStream[ItemT],
     ):
         self._data_iterator = data_iterator
         self._send_channel = send_channel
@@ -35,7 +34,13 @@ class Worker(Generic[ItemT], ABC):
     # has to be static since this will be run in a separate process and therefore won't have access to the class instance
     @staticmethod
     @abstractmethod
-    def process(shm_name: str, shape: tuple[int, ...], dtype: dtype, start_idx: int, end_idx: int) -> ItemT:
+    def process(
+        shm_name: str,
+        shape: tuple[int, ...],
+        dtype: dtype,
+        start_idx: int,
+        end_idx: int,
+    ) -> ItemT:
         pass
 
     @abstractmethod

@@ -8,9 +8,13 @@ from src.data_iterator import DataIterator
 @pytest.mark.parametrize(
     "chunk_size, size_of_data, expected_chunks",
     [
-        (3, 10, [(0, 3), (3, 6), (6, 9), (9, 10)]),  # Test with chunk size smaller than data
-        (5, 10, [(0, 5), (5, 10)]),         # Test with chunk size equal to data
-        (7, 10, [(0, 7), (7, 10)]),         # Test with chunk size larger than data
+        (
+            3,
+            10,
+            [(0, 3), (3, 6), (6, 9), (9, 10)],
+        ),  # Test with chunk size smaller than data
+        (5, 10, [(0, 5), (5, 10)]),  # Test with chunk size equal to data
+        (7, 10, [(0, 7), (7, 10)]),  # Test with chunk size larger than data
     ],
 )
 def test_data_iterator_iteration(chunk_size, size_of_data, expected_chunks):
@@ -25,6 +29,7 @@ def test_data_iterator_iteration(chunk_size, size_of_data, expected_chunks):
     chunks = list(iterator)
 
     assert chunks == expected_chunks
+
 
 def test_data_iterator_start_idx():
     """

@@ -17,7 +17,9 @@ logger = logging.getLogger(__name__)
 
 
 class WorkerOrchestrator:
-    def __init__(self, executor: Executor, workers: List[Worker], monitor_cpu_usage: bool):
+    def __init__(
+        self, executor: Executor, workers: List[Worker], monitor_cpu_usage: bool
+    ):
         self._executor = executor
         self._workers = workers
         self._monitor_cpu_usage = monitor_cpu_usage
@@ -45,8 +47,8 @@ class WorkerOrchestrator:
         while True:
             res = psutil.cpu_percent(None, percpu=True)
             for i, core_utilisation in enumerate(res):
-                df_data[f'core_{i}'].append(core_utilisation)
-            df_data['time'].append(datetime.datetime.utcnow())
+                df_data[f"core_{i}"].append(core_utilisation)
+            df_data["time"].append(datetime.datetime.utcnow())
             await asyncio.sleep(0.2)
 
     async def run(self) -> Dict:
@@ -66,12 +68,14 @@ class WorkerOrchestrator:
                             for start_idx, end_idx in data:
                                 fut = loop.run_in_executor(
                                     executor,
-                                    functools.partial(worker.process,
-                                                      data.shm_name,
-                                                      data.shm_shape,
-                                                      data.dtype,
-                                                      start_idx,
-                                                      end_idx)
+                                    functools.partial(
+                                        worker.process,
+                                        data.shm_name,
+                                        data.shm_shape,
+                                        data.dtype,
+                                        start_idx,
+                                        end_idx,
+                                    ),
                                 )
                                 tg.start_soon(self.wrapper, fut, send_channel.clone())
                 monitoring_tg.cancel_scope.cancel()

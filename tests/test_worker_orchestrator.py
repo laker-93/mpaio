@@ -18,21 +18,25 @@ from src.worker_orchestrator import WorkerOrchestrator
 def mock_executor():
     return MagicMock(Executor)
 
+
 @pytest.fixture
 def mock_workers():
     return [Mock(Worker)]
+
 
 @pytest.fixture
 def make_orchestrator(mock_executor, mock_workers):
     def orchestrator(workers=mock_workers, monitor=False):
         return WorkerOrchestrator(mock_executor, workers, monitor_cpu_usage=monitor)
+
     return orchestrator
+
 
 @pytest.mark.anyio
 async def test_wrapper(make_orchestrator):
     orchestrator = make_orchestrator()
     fut = asyncio.Future()
-    fut.set_result('foo')
+    fut.set_result("foo")
     send_channel = AsyncMock()
     send_channel.__aenter__.return_value = send_channel
     send_channel.__aexit__.return_value = None
@@ -40,7 +44,8 @@ async def test_wrapper(make_orchestrator):
     await orchestrator.wrapper(fut, send_channel)
 
     send_channel.__aenter__.assert_called_once()
-    send_channel.send.assert_called_once_with('foo')
+    send_channel.send.assert_called_once_with("foo")
+
 
 @pytest.mark.anyio
 async def test_cpu_percent(make_orchestrator):
@@ -48,13 +53,17 @@ async def test_cpu_percent(make_orchestrator):
     df_data = defaultdict(list)
 
     # Patch the datetime module to return a deterministic value
-    fixed_utcnow = datetime.datetime(2019, 9, 13, 12, 0, 0)  # Replace with your desired datetime
+    fixed_utcnow = datetime.datetime(
+        2019, 9, 13, 12, 0, 0
+    )  # Replace with your desired datetime
     mock_datetime = MagicMock()
     mock_datetime.utcnow.return_value = fixed_utcnow
 
     # Mock the psutil.cpu_percent call to return a specific value
     mock_cpu_percent = Mock(return_value=[10.0, 20.0, 30.0])
-    with patch('psutil.cpu_percent', mock_cpu_percent), patch('datetime.datetime', mock_datetime):
+    with patch("psutil.cpu_percent", mock_cpu_percent), patch(
+        "datetime.datetime", mock_datetime
+    ):
         asyncio.create_task.side_effect = [asyncio.CancelledError]
 
         async with anyio.create_task_group() as tg:
@@ -65,11 +74,12 @@ async def test_cpu_percent(make_orchestrator):
 
     # Check that df_data contains the expected CPU percentages and fixed_utcnow
     assert df_data == {
-        'core_0': [10.0],
-        'core_1': [20.0],
-        'core_2': [30.0],
-        'time': [fixed_utcnow]
+        "core_0": [10.0],
+        "core_1": [20.0],
+        "core_2": [30.0],
+        "time": [fixed_utcnow],
     }
+
 
 @pytest.mark.anyio
 async def test_run_no_monitoring(make_orchestrator):
@@ -99,7 +109,9 @@ async def test_run_no_monitoring(make_orchestrator):
         dtype=np.int32,
     )
 
-    total_number_of_iterations = math.ceil(size_1 / chunk_size_1) + math.ceil(size_2/ chunk_size_2)
+    total_number_of_iterations = math.ceil(size_1 / chunk_size_1) + math.ceil(
+        size_2 / chunk_size_2
+    )
 
     worker_1.data_iterator = iterator1
     worker_1.send_channel = send_channel
@@ -117,8 +129,7 @@ async def test_run_no_monitoring(make_orchestrator):
     mock_executor.__exit__.return_value = None
     future = asyncio.Future()
     mock_executor.submit = MagicMock(return_value=future)
-    future.set_result('foo')
-
+    future.set_result("foo")
 
     result = await orchestrator.run()
 
@@ -127,9 +138,6 @@ async def test_run_no_monitoring(make_orchestrator):
     mock_executor.__enter__.assert_called()
     mock_executor.__exit__.assert_called()
     mock_executor.submit.assert_called()
-    send_channel.send.assert_has_awaits(
-        [call('foo')] * total_number_of_iterations
-    )
+    send_channel.send.assert_has_awaits([call("foo")] * total_number_of_iterations)
     worker_1.consumer.assert_awaited()
     worker_2.consumer.assert_awaited()
-

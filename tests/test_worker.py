@@ -7,6 +7,7 @@ from src.item_type import ItemT
 from src.worker import Worker
 import numpy as np
 
+
 class AsyncContextManagerMock(Mock):
     async def __aenter__(self):
         return self
@@ -14,9 +15,16 @@ class AsyncContextManagerMock(Mock):
     async def __aexit__(self, exc_type, exc_value, traceback):
         pass
 
+
 class TestWorker(Worker):
     @staticmethod
-    def process(shm_name: str, shape: tuple[int, ...], dtype: dtype, start_idx: int, end_idx: int) -> ItemT:
+    def process(
+        shm_name: str,
+        shape: tuple[int, ...],
+        dtype: dtype,
+        start_idx: int,
+        end_idx: int,
+    ) -> ItemT:
         pass
 
     def consume_callback(self, processed_items: ItemT):
@@ -32,6 +40,7 @@ def data_iterator():
         shm_shape=(10,),
         dtype=dtype(np.int32),
     )
+
 
 @pytest.fixture
 def send_channel():
@@ -67,11 +76,11 @@ def test_process_mocked(data_iterator, send_channel, receive_channel):
 
     assert result == "processed_item"
 
+
 @pytest.mark.anyio
 async def test_consume_callback_mocked(data_iterator, send_channel, receive_channel):
-    receive_channel.add_item('item1')
+    receive_channel.add_item("item1")
     worker = TestWorker(data_iterator, send_channel, receive_channel)
     worker.consume_callback = Mock()
     await worker.consumer(receive_channel)
     worker.consume_callback.assert_called_once_with("item1")
-
