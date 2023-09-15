@@ -10,8 +10,8 @@ import anyio
 import psutil
 from anyio.streams.memory import MemoryObjectSendStream
 
-from src.item_type import ItemT
-from src.worker import Worker
+from mpaio.src.item_type import ItemT
+from mpaio.src.worker import Worker
 
 logger = logging.getLogger(__name__)
 

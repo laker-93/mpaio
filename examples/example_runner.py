@@ -10,8 +10,8 @@ import pandas as pd
 
 from examples.workers.add_int_worker import AddIntWorker
 from examples.workers.concat_str_worker import ConcatStrWorker
-from src.data_iterator import DataIterator
-from src.worker_orchestrator import WorkerOrchestrator
+from mpaio.src.data_iterator import DataIterator
+from mpaio.src.worker_orchestrator import WorkerOrchestrator
 
 
 def setup_concat_str_worker(

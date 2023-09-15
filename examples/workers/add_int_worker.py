@@ -1,9 +1,8 @@
 from multiprocessing.shared_memory import SharedMemory
 
-import numpy
 import numpy as np
 
-from src.worker import Worker
+from mpaio.src.worker import Worker
 
 
 class AddIntWorker(Worker["int"]):
