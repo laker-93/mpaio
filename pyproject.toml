@@ -27,3 +27,10 @@ examples = [
     "matplotlib",
     "pandas"
 ]
+test = [
+    "pytest",
+    "flake8",
+    "mypy",
+    "types-psutil",
+    "coverage"
+]
