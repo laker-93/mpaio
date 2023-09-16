@@ -29,7 +29,7 @@ def setup_concat_str_worker(
     str_data_iterator = DataIterator(
         shm_name=shm_strings.name,
         chunk_size=20,
-        dtype=shm_strings_data.dtype,
+        data_type=shm_strings_data.dtype,
         size_of_data=shm_strings_data.size,
         shm_shape=shm_strings_data.shape,
     )
@@ -58,7 +58,7 @@ def setup_add_int_worker(manager: SharedMemoryManager, n_workers: int) -> AddInt
     num_data_iterator = DataIterator(
         shm_name=shm_nums.name,
         chunk_size=chunk_size,
-        dtype=shm_nums_data.dtype,
+        data_type=shm_nums_data.dtype,
         size_of_data=shm_nums_data.size,
         shm_shape=shm_nums_data.shape,
     )

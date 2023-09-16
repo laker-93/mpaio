@@ -72,7 +72,7 @@ class WorkerOrchestrator:
                                         worker.process,
                                         data.shm_name,
                                         data.shm_shape,
-                                        data.dtype,
+                                        data.data_type,
                                         start_idx,
                                         end_idx,
                                     ),

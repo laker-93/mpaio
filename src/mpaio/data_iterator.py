@@ -11,7 +11,7 @@ class DataIterator:
     chunk_size: int
     size_of_data: int
     shm_shape: tuple[int, ...]
-    dtype: dtype
+    data_type: dtype
     start_idx: int = 0
 
     def __iter__(self) -> Iterator[tuple[int, int]]:

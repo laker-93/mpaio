@@ -38,7 +38,7 @@ def data_iterator():
         chunk_size=3,
         size_of_data=10,
         shm_shape=(10,),
-        dtype=dtype(np.int32),
+        data_type=dtype(np.int32),
     )
 
 

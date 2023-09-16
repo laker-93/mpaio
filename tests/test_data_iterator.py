@@ -23,7 +23,7 @@ def test_data_iterator_iteration(chunk_size, size_of_data, expected_chunks):
         chunk_size=chunk_size,
         size_of_data=size_of_data,
         shm_shape=(10,),
-        dtype=np.int32,
+        data_type=np.int32,
     )
 
     chunks = list(iterator)
@@ -41,7 +41,7 @@ def test_data_iterator_start_idx():
         chunk_size=4,
         size_of_data=12,
         shm_shape=(12,),
-        dtype=np.int32,
+        data_type=np.int32,
         start_idx=2,
     )
 

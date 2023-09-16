@@ -98,7 +98,7 @@ async def test_run_no_monitoring(make_orchestrator):
         chunk_size=chunk_size_1,
         size_of_data=size_1,
         shm_shape=(10,),
-        dtype=np.int32,
+        data_type=np.int32,
     )
     chunk_size_2 = 4
     size_2 = 10
@@ -107,7 +107,7 @@ async def test_run_no_monitoring(make_orchestrator):
         chunk_size=4,
         size_of_data=10,
         shm_shape=(10,),
-        dtype=np.int32,
+        data_type=np.int32,
     )
 
     total_number_of_iterations = math.ceil(size_1 / chunk_size_1) + math.ceil(
@@ -160,7 +160,7 @@ async def test_run_monitoring(monkeypatch, make_orchestrator):
         chunk_size=chunk_size_1,
         size_of_data=size_1,
         shm_shape=(10,),
-        dtype=np.int32,
+        data_type=np.int32,
     )
     chunk_size_2 = 4
     size_2 = 10
@@ -169,7 +169,7 @@ async def test_run_monitoring(monkeypatch, make_orchestrator):
         chunk_size=4,
         size_of_data=10,
         shm_shape=(10,),
-        dtype=np.int32,
+        data_type=np.int32,
     )
 
     total_number_of_iterations = math.ceil(size_1 / chunk_size_1) + math.ceil(
