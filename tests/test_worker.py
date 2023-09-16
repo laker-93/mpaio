@@ -1,3 +1,4 @@
+from __future__ import annotations
 import pytest
 from unittest.mock import Mock
 from anyio.streams.memory import MemoryObjectSendStream, MemoryObjectReceiveStream
