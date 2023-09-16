@@ -29,7 +29,7 @@ examples = [
 ]
 test = [
     "pytest",
-    "flake8",
+    "flake8>=6.1.0",
     "mypy",
     "types-psutil",
     "coverage"
