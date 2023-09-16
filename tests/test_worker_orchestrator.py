@@ -143,6 +143,7 @@ async def test_run_no_monitoring(make_orchestrator):
     worker_1.consumer.assert_awaited()
     worker_2.consumer.assert_awaited()
 
+
 @pytest.mark.anyio
 async def test_run_monitoring(monkeypatch, make_orchestrator):
     send_channel = AsyncMock()
