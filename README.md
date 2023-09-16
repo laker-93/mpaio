@@ -1,3 +1,31 @@
+# MPAIO
+
+MPAIO is a library for parallel processing a numpy array using a pool of workers, each running on a separate process. It
+performs the processing asynchronously so none of the work in starting the workers, or collecting their results when
+finished, blocks.
+Each worker handles processing a chunk of the array and MPAIO coordinates giving the results back to the user.
+MPAIO expects the array to be processed to be available in shared memory and to remain constant.
+MPAIO internally uses Python std library `ProcessPoolExecutor` to run the workers:
+https://docs.python.org/3/library/concurrent.futures.html#processpoolexecutor-example
+MPAIO uses anyio to do the asynchronous scheduling.
+
+MPAIO is composed of:
+    - a `DataIterator` class
+        - encapsulates meta-data of the shared memory buffer and logic of how to divide the array amongst the workers.
+    - an abstract `Worker` class
+        - defines a template for a worker and the logic to process a chunk of the data.
+        - a `Worker` takes the `DataIterator` object that it will be processing.
+    - a `WorkerOrchestrator` class
+        - runs the workers in the executor and handles the results.
+
+MPAIO is designed using dependency injection, so the executor and shared memory must be created in the user code and
+injected in when constructing the `WorkerOrchestrator`.
+
+An example is included in `examples/` that sets up two shared memory arrays, one containing strings, the other
+containing integers. For each of these arrays, a `Worker` is defined to process the data, finally each defines their own
+`DataIterator` defining how the array should be batched.
+
+## Implementation Notes
 Use data structures created by multiprocess
 manager: https://docs.python.org/3/library/multiprocessing.html#multiprocessing.Manager
 if needing to coordinate both reading and writing from child to parent processes.
