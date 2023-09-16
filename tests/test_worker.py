@@ -15,7 +15,7 @@ class AsyncContextManagerMock(Mock):
         pass
 
 
-class TestWorker(Worker['str']):
+class WorkerTester(Worker['str']):
     @staticmethod
     def process(
         shm_name: str,
@@ -68,7 +68,7 @@ def receive_channel():
 
 
 def test_process_mocked(data_iterator, send_channel, receive_channel):
-    worker = TestWorker(data_iterator, send_channel, receive_channel)
+    worker = WorkerTester(data_iterator, send_channel, receive_channel)
     worker.process = Mock(return_value="processed_item")
 
     result = worker.process("shm_name", (1, 2), dtype(np.int32), 0, 3)
@@ -79,7 +79,7 @@ def test_process_mocked(data_iterator, send_channel, receive_channel):
 @pytest.mark.anyio
 async def test_consume_callback_mocked(data_iterator, send_channel, receive_channel):
     receive_channel.add_item("item1")
-    worker = TestWorker(data_iterator, send_channel, receive_channel)
+    worker = WorkerTester(data_iterator, send_channel, receive_channel)
     worker.consume_callback = Mock()
     await worker.consumer(receive_channel)
     worker.consume_callback.assert_called_once_with("item1")
