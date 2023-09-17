@@ -1,4 +1,5 @@
 from multiprocessing.shared_memory import SharedMemory
+from typing import Tuple
 
 import numpy as np
 
@@ -16,7 +17,7 @@ class ConcatStrWorker(Worker["str"]):
     @staticmethod
     def process(
         shm_name: str,
-        shape: tuple[int, ...],
+        shape: Tuple[int, ...],
         dtype: np.dtype,
         start_idx: int,
         end_idx: int,
