@@ -14,7 +14,13 @@ class AddIntWorker(Worker["int"]):
         self._result += processed_items
 
     @staticmethod
-    def process(shm_name: str, shape: tuple[int, ...], dtype: np.dtype, start_idx: int, end_idx: int) -> int:
+    def process(
+        shm_name: str,
+        shape: tuple[int, ...],
+        dtype: np.dtype,
+        start_idx: int,
+        end_idx: int,
+    ) -> int:
         shm = SharedMemory(shm_name)
         data: np.ndarray = np.ndarray(shape=shape, dtype=dtype, buffer=shm.buf)
         result = 0

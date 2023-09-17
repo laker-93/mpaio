@@ -15,6 +15,7 @@ from mpaio.item_type import ItemT
 from mpaio.worker import Worker
 from mpaio.worker_orchestrator import WorkerOrchestrator
 
+
 @pytest.fixture
 def mock_send_channel():
     send_channel = AsyncMock()
@@ -23,16 +24,19 @@ def mock_send_channel():
     send_channel.clone = MagicMock(return_value=send_channel)
     return send_channel
 
+
 @pytest.fixture
 def mock_receive_channel():
     receive_channel = MagicMock()
     return receive_channel
+
 
 @pytest.fixture
 def create_mock_memory_object_stream(mock_send_channel, mock_receive_channel):
     class mock_create_memory_object_stream(Generic[ItemT]):
         def __new__(cls):
             return mock_send_channel, mock_receive_channel
+
     return mock_create_memory_object_stream
 
 
@@ -77,9 +81,7 @@ async def test_cpu_percent(make_orchestrator):
     df_data = defaultdict(list)
 
     # Patch the datetime module to return a deterministic value
-    fixed_utcnow = datetime.datetime(
-        2019, 9, 13, 12, 0, 0
-    )
+    fixed_utcnow = datetime.datetime(2019, 9, 13, 12, 0, 0)
     mock_datetime = MagicMock()
     mock_datetime.utcnow.return_value = fixed_utcnow
 
@@ -88,7 +90,6 @@ async def test_cpu_percent(make_orchestrator):
     with patch("psutil.cpu_percent", mock_cpu_percent), patch(
         "datetime.datetime", mock_datetime
     ):
-
         async with anyio.create_task_group() as tg:
             tg.start_soon(orchestrator.cpu_percent, df_data)
             while len(df_data) == 0:
@@ -105,7 +106,9 @@ async def test_cpu_percent(make_orchestrator):
 
 
 @pytest.mark.anyio
-async def test_run_no_monitoring(make_orchestrator, create_mock_memory_object_stream, mock_send_channel):
+async def test_run_no_monitoring(
+    make_orchestrator, create_mock_memory_object_stream, mock_send_channel
+):
     worker_1 = MagicMock()
     worker_2 = MagicMock()
 
@@ -148,7 +151,6 @@ async def test_run_no_monitoring(make_orchestrator, create_mock_memory_object_st
     mock_executor.submit = MagicMock(return_value=future)
     future.set_result("foo")
 
-
     with patch("anyio.create_memory_object_stream", create_mock_memory_object_stream):
         result = await orchestrator.run()
 
@@ -163,7 +165,9 @@ async def test_run_no_monitoring(make_orchestrator, create_mock_memory_object_st
 
 
 @pytest.mark.anyio
-async def test_run_monitoring(monkeypatch, make_orchestrator, mock_send_channel, create_mock_memory_object_stream):
+async def test_run_monitoring(
+    monkeypatch, make_orchestrator, mock_send_channel, create_mock_memory_object_stream
+):
     worker_1 = MagicMock()
     worker_2 = MagicMock()
 
@@ -207,9 +211,7 @@ async def test_run_monitoring(monkeypatch, make_orchestrator, mock_send_channel,
     future.set_result("foo")
 
     # Patch the datetime module to return a deterministic value
-    fixed_utcnow = datetime.datetime(
-        2019, 9, 13, 12, 0, 0
-    )
+    fixed_utcnow = datetime.datetime(2019, 9, 13, 12, 0, 0)
     mock_datetime = MagicMock()
     mock_datetime.utcnow.return_value = fixed_utcnow
 
@@ -218,20 +220,15 @@ async def test_run_monitoring(monkeypatch, make_orchestrator, mock_send_channel,
 
     mock_memory_object_stream = create_mock_memory_object_stream
 
-    with patch(
-            "anyio.create_memory_object_stream", mock_memory_object_stream
-    ), patch(
-            "psutil.cpu_percent", mock_cpu_percent
-    ), patch(
-            "datetime.datetime", mock_datetime
-    ):
-
+    with patch("anyio.create_memory_object_stream", mock_memory_object_stream), patch(
+        "psutil.cpu_percent", mock_cpu_percent
+    ), patch("datetime.datetime", mock_datetime):
         result = await orchestrator.run()
 
     expected_result = defaultdict(list)
     for i, cpu_util in enumerate(mock_cpu_util):
-        expected_result[f'core_{i}'].append(cpu_util)
-    expected_result['time'] = [fixed_utcnow]
+        expected_result[f"core_{i}"].append(cpu_util)
+    expected_result["time"] = [fixed_utcnow]
 
     assert result == expected_result
 

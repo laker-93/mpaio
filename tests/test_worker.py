@@ -17,7 +17,7 @@ class AsyncContextManagerMock(Mock):
         pass
 
 
-class WorkerTester(Worker['str']):
+class WorkerTester(Worker["str"]):
     @staticmethod
     def process(
         shm_name: str,
@@ -26,7 +26,7 @@ class WorkerTester(Worker['str']):
         start_idx: int,
         end_idx: int,
     ) -> str:
-        return 'foo'
+        return "foo"
 
     def consume_callback(self, processed_items: str):
         pass
@@ -41,7 +41,6 @@ def data_iterator():
         shm_shape=(10,),
         data_type=dtype(np.int32),
     )
-
 
 
 @pytest.fixture

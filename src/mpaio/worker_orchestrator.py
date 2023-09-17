@@ -63,7 +63,10 @@ class WorkerOrchestrator:
                     for worker in self._workers:
                         data = worker.data_iterator
                         worker_result_type = self._get_worker_result_type(worker)
-                        send_channel, receive_channel = anyio.create_memory_object_stream[worker_result_type]()
+                        (
+                            send_channel,
+                            receive_channel,
+                        ) = anyio.create_memory_object_stream[worker_result_type]()
                         async with send_channel, receive_channel:
                             tg.start_soon(worker.consumer, receive_channel.clone())
                             for start_idx, end_idx in data:
@@ -89,7 +92,7 @@ class WorkerOrchestrator:
         hinted anyio memory object streams.
         """
         try:
-            worker_result_type = worker.process.__annotation__['return']
+            worker_result_type = worker.process.__annotation__["return"]
         except (AttributeError, KeyError):
             worker_result_type = Any
         return worker_result_type

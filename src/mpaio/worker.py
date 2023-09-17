@@ -9,10 +9,7 @@ from mpaio.item_type import ItemT
 
 
 class Worker(Generic[ItemT], ABC):
-    def __init__(
-        self,
-        data_iterator: DataIterator
-    ):
+    def __init__(self, data_iterator: DataIterator):
         self._data_iterator = data_iterator
 
     @property

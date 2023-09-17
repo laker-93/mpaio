@@ -34,9 +34,7 @@ def setup_concat_str_worker(
         shm_shape=shm_strings_data.shape,
     )
 
-    return ConcatStrWorker(
-        data_iterator=str_data_iterator
-    )
+    return ConcatStrWorker(data_iterator=str_data_iterator)
 
 
 def setup_add_int_worker(manager: SharedMemoryManager, n_workers: int) -> AddIntWorker:
@@ -60,9 +58,7 @@ def setup_add_int_worker(manager: SharedMemoryManager, n_workers: int) -> AddInt
         shm_shape=shm_nums_data.shape,
     )
 
-    return AddIntWorker(
-        data_iterator=num_data_iterator
-    )
+    return AddIntWorker(data_iterator=num_data_iterator)
 
 
 async def runner():
