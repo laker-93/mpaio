@@ -1,8 +1,7 @@
 [project]
 name = "mpaio"
 description = "Asynchronous Multi Processing for parallel processing of a numpy array using a pool of workers."
-# updated by the CI when a tag is pushed
-version = "{{VERSION_PLACEHOLDER}}"
+version = "0.1.0"
 authors = [
     { name = "Luke Purnell", email = "luke.a.purnell@gmail.com" }
 ]
