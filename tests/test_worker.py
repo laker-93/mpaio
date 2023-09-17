@@ -1,7 +1,8 @@
-from __future__ import annotations
+from typing import Tuple
+
 import pytest
 from unittest.mock import Mock
-from anyio.streams.memory import MemoryObjectSendStream, MemoryObjectReceiveStream
+from anyio.streams.memory import MemoryObjectReceiveStream
 from numpy.core.multiarray import dtype
 from mpaio.data_iterator import DataIterator
 from mpaio.worker import Worker
@@ -20,7 +21,7 @@ class WorkerTester(Worker['str']):
     @staticmethod
     def process(
         shm_name: str,
-        shape: tuple[int, ...],
+        shape: Tuple[int, ...],
         dtype: dtype,
         start_idx: int,
         end_idx: int,
@@ -41,10 +42,6 @@ def data_iterator():
         data_type=dtype(np.int32),
     )
 
-
-@pytest.fixture
-def send_channel():
-    return Mock(spec=MemoryObjectSendStream)
 
 
 @pytest.fixture
@@ -68,8 +65,9 @@ def receive_channel():
     return mock_receive_channel
 
 
-def test_process_mocked(data_iterator, send_channel, receive_channel):
-    worker = WorkerTester(data_iterator, send_channel, receive_channel)
+def test_process_mocked(data_iterator, receive_channel):
+    worker = WorkerTester(data_iterator)
+
     worker.process = Mock(return_value="processed_item")
 
     result = worker.process("shm_name", (1, 2), dtype(np.int32), 0, 3)
@@ -78,9 +76,9 @@ def test_process_mocked(data_iterator, send_channel, receive_channel):
 
 
 @pytest.mark.anyio
-async def test_consume_callback_mocked(data_iterator, send_channel, receive_channel):
+async def test_consume_callback_mocked(data_iterator, receive_channel):
     receive_channel.add_item("item1")
-    worker = WorkerTester(data_iterator, send_channel, receive_channel)
+    worker = WorkerTester(data_iterator)
     worker.consume_callback = Mock()
     await worker.consumer(receive_channel)
     worker.consume_callback.assert_called_once_with("item1")

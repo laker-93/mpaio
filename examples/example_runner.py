@@ -34,11 +34,8 @@ def setup_concat_str_worker(
         shm_shape=shm_strings_data.shape,
     )
 
-    send_channel, receive_channel = anyio.create_memory_object_stream[str]()
     return ConcatStrWorker(
-        data_iterator=str_data_iterator,
-        send_channel=send_channel,
-        receive_channel=receive_channel,
+        data_iterator=str_data_iterator
     )
 
 
@@ -63,11 +60,8 @@ def setup_add_int_worker(manager: SharedMemoryManager, n_workers: int) -> AddInt
         shm_shape=shm_nums_data.shape,
     )
 
-    send_channel, receive_channel = anyio.create_memory_object_stream[int]()
     return AddIntWorker(
-        data_iterator=num_data_iterator,
-        send_channel=send_channel,
-        receive_channel=receive_channel,
+        data_iterator=num_data_iterator
     )
 
 

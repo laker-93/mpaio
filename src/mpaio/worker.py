@@ -1,8 +1,7 @@
-from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import Generic
+from typing import Generic, Tuple
 
-from anyio.streams.memory import MemoryObjectSendStream, MemoryObjectReceiveStream
+from anyio.streams.memory import MemoryObjectReceiveStream
 from numpy.core.multiarray import dtype
 
 from mpaio.data_iterator import DataIterator
@@ -12,25 +11,13 @@ from mpaio.item_type import ItemT
 class Worker(Generic[ItemT], ABC):
     def __init__(
         self,
-        data_iterator: DataIterator,
-        send_channel: MemoryObjectSendStream[ItemT],
-        receive_channel: MemoryObjectReceiveStream[ItemT],
+        data_iterator: DataIterator
     ):
         self._data_iterator = data_iterator
-        self._send_channel = send_channel
-        self._receive_channel = receive_channel
 
     @property
     def data_iterator(self):
         return self._data_iterator
-
-    @property
-    def send_channel(self):
-        return self._send_channel
-
-    @property
-    def receive_channel(self):
-        return self._receive_channel
 
     # has to be static since this will be run in a separate process and therefore won't have access to the class
     # instance
@@ -38,7 +25,7 @@ class Worker(Generic[ItemT], ABC):
     @abstractmethod
     def process(
         shm_name: str,
-        shape: tuple[int, ...],
+        shape: Tuple[int, ...],
         dtype: dtype,
         start_idx: int,
         end_idx: int,
