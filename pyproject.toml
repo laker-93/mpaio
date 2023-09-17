@@ -1,7 +1,7 @@
 [project]
 name = "mpaio"
 description = "Asynchronous Multi Processing for parallel processing of a numpy array using a pool of workers."
-version = "0.2.0"
+readme = "README.md"
 authors = [
     { name = "Luke Purnell", email = "luke.a.purnell@gmail.com" }
 ]
@@ -43,5 +43,7 @@ publish = [
 
 
 [build-system]
-requires = ["setuptools>=68.0.0", "wheel"]
+requires = ["setuptools>=68.0.0", "wheel", "setuptools_scm[toml]>=7.0"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
