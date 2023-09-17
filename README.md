@@ -1,5 +1,7 @@
 # MPAIO
 
+## Overview
+
 MPAIO is a library for parallel processing a numpy array using a pool of workers, each running on a separate process. It
 performs the processing asynchronously so none of the work in starting the workers, or collecting their results when
 finished, blocks.
@@ -21,9 +23,32 @@ MPAIO is composed of:
 MPAIO is designed using dependency injection, so the executor and shared memory must be created in the user code and
 injected in when constructing the `WorkerOrchestrator`.
 
+## Demo
+
 An example is included in `examples/` that sets up two shared memory arrays, one containing strings, the other
 containing integers. For each of these arrays, a `Worker` is defined to process the data, finally each defines their own
-`DataIterator` defining how the array should be batched.
+`DataIterator` defining how the array should be batched. The workers themselves are for demonstrative purposes - they
+implement some arbitrary CPU intensive operations for the two different shared memory blocks.
+
+To run the examples:
+
+1. git clone the repo
+    a. `git clone https://github.com/laker-93/mpaio.git`
+2. create a new venv and activate
+    a. `python3 -m venv venv`
+    b. `source venv/bin/activate`
+3. pip install
+    a. `pip install mpaio`
+4. pip install the extra dependencies to run the examples
+    a. `pip install mpaio[examples]`
+    b. `pip install mpaio'[examples]'` (on MacOS)
+5. run the example
+    a. `python examples/example_runner.py`
+
+This will also produce a plot of the CPU utilisation from running the examples. Increasing `n_workers` in 
+`example_runner.py` will utilise more cores (if your machine has them available) and therefore the work should be
+completed faster.
+``
 
 ## Implementation Notes
 Use data structures created by multiprocess
