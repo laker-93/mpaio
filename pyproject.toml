@@ -1,7 +1,8 @@
 [project]
 name = "mpaio"
 description = "Asynchronous Multi Processing for parallel processing of a numpy array using a pool of workers."
-version = "0.1.0"
+# updated by the CI when a tag is pushed
+version = "{{VERSION_PLACEHOLDER}}"
 authors = [
     { name = "Luke Purnell", email = "luke.a.purnell@gmail.com" }
 ]
@@ -34,3 +35,14 @@ test = [
     "types-psutil",
     "coverage"
 ]
+publish = [
+    "build",
+    "twine",
+    "wheel",
+    "setuptools",
+]
+
+
+[build-system]
+requires = ["setuptools>=68.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
