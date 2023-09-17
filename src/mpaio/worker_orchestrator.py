@@ -62,11 +62,13 @@ class WorkerOrchestrator:
                 async with anyio.create_task_group() as tg:
                     for worker in self._workers:
                         data = worker.data_iterator
-                        worker_result_type = self._get_worker_result_type(worker)
+                        # The type sent over these memory channels is the type returned by the worker's process method
+                        # using introspection to get this type dynamically is not well supported yet by Python so for
+                        # now just use 'Any' as the type.
                         (
                             send_channel,
                             receive_channel,
-                        ) = anyio.create_memory_object_stream[worker_result_type]()
+                        ) = anyio.create_memory_object_stream[Any]()
                         async with send_channel, receive_channel:
                             tg.start_soon(worker.consumer, receive_channel.clone())
                             for start_idx, end_idx in data:
@@ -84,15 +86,3 @@ class WorkerOrchestrator:
                                 tg.start_soon(self.wrapper, fut, send_channel.clone())
                 monitoring_tg.cancel_scope.cancel()
         return df_data
-
-    @staticmethod
-    def _get_worker_result_type(worker: Worker):
-        """
-        If the worker implements a type hinted process method, then get that type. This is needed for creating type
-        hinted anyio memory object streams.
-        """
-        try:
-            worker_result_type = worker.process.__annotation__["return"]
-        except (AttributeError, KeyError):
-            worker_result_type = Any
-        return worker_result_type
