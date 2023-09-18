@@ -30,10 +30,10 @@ class Worker(Generic[ItemT], ABC):
         pass
 
     @abstractmethod
-    def consume_callback(self, processed_items: ItemT):
+    def process_callback(self, processed_items: ItemT):
         pass
 
     async def consumer(self, receive_channel: MemoryObjectReceiveStream[ItemT]):
         async with receive_channel:
             async for res in receive_channel:
-                self.consume_callback(res)
+                self.process_callback(res)

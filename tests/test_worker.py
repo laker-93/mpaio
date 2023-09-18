@@ -28,7 +28,7 @@ class WorkerTester(Worker["str"]):
     ) -> str:
         return "foo"
 
-    def consume_callback(self, processed_items: str):
+    def process_callback(self, processed_items: str):
         pass
 
 
@@ -78,6 +78,6 @@ def test_process_mocked(data_iterator, receive_channel):
 async def test_consume_callback_mocked(data_iterator, receive_channel):
     receive_channel.add_item("item1")
     worker = WorkerTester(data_iterator)
-    worker.consume_callback = Mock()
+    worker.process_callback = Mock()
     await worker.consumer(receive_channel)
-    worker.consume_callback.assert_called_once_with("item1")
+    worker.process_callback.assert_called_once_with("item1")

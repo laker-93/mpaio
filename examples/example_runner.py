@@ -17,7 +17,8 @@ from mpaio.worker_orchestrator import WorkerOrchestrator
 def setup_concat_str_worker(
     manager: SharedMemoryManager, n_workers: int
 ) -> ConcatStrWorker:
-    data_string = np.array([f"foo_{i}" for i in range(100)])
+    data = [f"foo_{i}" for i in range(100)]
+    data_string = np.array(data)
     shm_strings = manager.SharedMemory(data_string.nbytes)
     shm_strings_data: np.ndarray = np.ndarray(
         shape=data_string.shape, dtype=data_string.dtype, buffer=shm_strings.buf
@@ -28,7 +29,7 @@ def setup_concat_str_worker(
 
     str_data_iterator = DataIterator(
         shm_name=shm_strings.name,
-        chunk_size=20,
+        chunk_size=len(data) // n_workers,
         data_type=shm_strings_data.dtype,
         size_of_data=shm_strings_data.size,
         shm_shape=shm_strings_data.shape,
@@ -62,19 +63,20 @@ def setup_add_int_worker(manager: SharedMemoryManager, n_workers: int) -> AddInt
 
 
 async def runner():
-    n_workers = 6
+    n_workers = None
     executor = ProcessPoolExecutor(
-        mp_context=multiprocessing.get_context("spawn"), max_workers=n_workers
+        mp_context=multiprocessing.get_context("spawn"),
+        max_workers=n_workers
     )
 
     with SharedMemoryManager() as manager:
         worker_add = setup_add_int_worker(manager, n_workers)
         worker_str = setup_concat_str_worker(manager, n_workers)
-        mp_manager = WorkerOrchestrator(
+        worker_orchestrator = WorkerOrchestrator(
             executor, workers=[worker_add, worker_str], monitor_cpu_usage=True
         )
         start_time = datetime.datetime.utcnow()
-        df_data = await mp_manager.run()
+        df_data = await worker_orchestrator.run()
         end_time = datetime.datetime.utcnow()
         total_time = (end_time - start_time).total_seconds()
         print(f"got result {worker_add.result} in {total_time}")

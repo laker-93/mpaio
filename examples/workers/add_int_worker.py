@@ -11,7 +11,7 @@ class AddIntWorker(Worker["int"]):
         super().__init__(*args, **kwargs)
         self._result = 0
 
-    def consume_callback(self, processed_items: int):
+    def process_callback(self, processed_items: int):
         self._result += processed_items
 
     @staticmethod

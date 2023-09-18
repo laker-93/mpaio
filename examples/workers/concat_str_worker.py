@@ -11,7 +11,7 @@ class ConcatStrWorker(Worker["str"]):
         super().__init__(*args, **kwargs)
         self._result = ""
 
-    def consume_callback(self, processed_items: str):
+    def process_callback(self, processed_items: str):
         self._result += processed_items
 
     @staticmethod
