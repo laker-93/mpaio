@@ -1,0 +1,36 @@
+@startuml
+left to right direction
+' Horizontal lines: -->, <--, <-->
+' Vertical lines: ->, <-, <->
+title PERT: Project Name
+
+map SHM.block0 {
+}
+map SHM.block1 {
+}
+map SHM.block2 {
+}
+map SHM.block3 {
+}
+map core.0 {
+    Start => End
+}
+map core.1 {
+    Start => End
+}
+map core.2 {
+    Start => End
+}
+map core.3 {
+    Start => End
+}
+
+SHM.block0 --> core.0 : Label 1
+SHM.block1 --> core.1 : Label 1
+SHM.block2 --> core.2 : Label 1
+SHM.block3 --> core.3 : Label 1
+task.1 --> task.4
+task.2 --> task.4
+task.3 --> task.4
+task.4 --> task.5 : Label 4
+@enduml
