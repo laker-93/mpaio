@@ -2,7 +2,7 @@
 name = "mpaio"
 description = "Asynchronous Multi Processing for parallel processing of a numpy array using a pool of workers."
 readme = "README.md"
-version = '0.5.0'
+version = '0.6.0'
 authors = [
     { name = "Luke Purnell", email = "luke.a.purnell@gmail.com" }
 ]

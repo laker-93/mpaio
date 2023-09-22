@@ -2,7 +2,7 @@
 left to right direction
 ' Horizontal lines: -->, <--, <-->
 ' Vertical lines: ->, <-, <->
-title PERT: Project Name
+title MPAIO: optimum batching on a 4 core system
 
 map SHM.block0 {
 }
@@ -13,24 +13,30 @@ map SHM.block2 {
 map SHM.block3 {
 }
 map core.0 {
-    Start => End
 }
 map core.1 {
-    Start => End
 }
 map core.2 {
-    Start => End
 }
 map core.3 {
-    Start => End
+}
+map worker.0 {
+}
+map worker.1 {
+}
+map worker.2 {
+}
+map worker.3 {
 }
 
-SHM.block0 --> core.0 : Label 1
-SHM.block1 --> core.1 : Label 1
-SHM.block2 --> core.2 : Label 1
-SHM.block3 --> core.3 : Label 1
-task.1 --> task.4
-task.2 --> task.4
-task.3 --> task.4
-task.4 --> task.5 : Label 4
+SHM.block0 <-- core.0 : process
+SHM.block1 <-- core.1 : process
+SHM.block2 <-- core.2 : process
+SHM.block3 <-- core.3 : process
+
+core.0 --> worker.0 : process_callback
+core.1 --> worker.1 : process_callback
+core.2 --> worker.2 : process_callback
+core.3 --> worker.3 : process_callback
+
 @enduml
