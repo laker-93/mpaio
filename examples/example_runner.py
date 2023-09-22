@@ -15,7 +15,7 @@ from mpaio.worker_orchestrator import WorkerOrchestrator
 
 
 def setup_concat_str_worker(
-    manager: SharedMemoryManager, n_workers: int
+    manager: SharedMemoryManager, n_partitions: int
 ) -> ConcatStrWorker:
     data = [f"foo_{i}" for i in range(100)]
     data_string = np.array(data)
@@ -29,7 +29,7 @@ def setup_concat_str_worker(
 
     str_data_iterator = DataIterator(
         shm_name=shm_strings.name,
-        chunk_size=len(data) // n_workers,
+        chunk_size=len(data) // n_partitions,
         data_type=shm_strings_data.dtype,
         size_of_data=shm_strings_data.size,
         shm_shape=shm_strings_data.shape,
@@ -38,10 +38,10 @@ def setup_concat_str_worker(
     return ConcatStrWorker(data_iterator=str_data_iterator)
 
 
-def setup_add_int_worker(manager: SharedMemoryManager, n_workers: int) -> AddIntWorker:
+def setup_add_int_worker(manager: SharedMemoryManager, n_partitions: int) -> AddIntWorker:
     start = 1
     end = 100_000_001
-    chunk_size = (end - start) // n_workers
+    chunk_size = (end - start) // n_partitions
     data_nums = np.array(list(range(start, end)))
     shm_nums = manager.SharedMemory(data_nums.nbytes)
     shm_nums_data: np.ndarray = np.ndarray(
@@ -63,15 +63,16 @@ def setup_add_int_worker(manager: SharedMemoryManager, n_workers: int) -> AddInt
 
 
 async def runner():
-    n_workers = None
+    n_workers = 8
     executor = ProcessPoolExecutor(
         mp_context=multiprocessing.get_context("spawn"),
         max_workers=n_workers
     )
+    n_partitions = 8
 
     with SharedMemoryManager() as manager:
-        worker_add = setup_add_int_worker(manager, n_workers)
-        worker_str = setup_concat_str_worker(manager, n_workers)
+        worker_add = setup_add_int_worker(manager, n_partitions)
+        worker_str = setup_concat_str_worker(manager, n_partitions)
         worker_orchestrator = WorkerOrchestrator(
             executor, workers=[worker_add, worker_str], monitor_cpu_usage=True
         )
