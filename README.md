@@ -14,13 +14,13 @@ https://docs.python.org/3/library/concurrent.futures.html#processpoolexecutor-ex
 MPAIO uses anyio to do the asynchronous scheduling.
 
 MPAIO is composed of:
-    - a `DataIterator` class
-        - encapsulates meta-data of the shared memory buffer and logic of how to partition the array amongst the workers.
-    - an abstract `Worker` class
-        - defines a template for a worker and the logic to process a chunk of the data.
-        - a `Worker` is constructed with the `DataIterator` object that it will be processing.
-    - a `WorkerOrchestrator` class
-        - runs the workers in the executor and makes the results from the sub processes available in the main process.
+1. a `DataIterator` class
+    - encapsulates meta-data of the shared memory buffer and logic of how to partition the array amongst the workers.
+2. an abstract `Worker` class
+    - defines a template for a worker and the logic to process a chunk of the data.
+    - a `Worker` is constructed with the `DataIterator` object that it will be processing.
+3. a `WorkerOrchestrator` class
+    - runs the workers in the executor and makes the results from the sub processes available in the main process.
 
 ## How to use
 
@@ -56,6 +56,7 @@ of the `Worker`. One for each shared memory block.
 For optimum performance, all cores of the system should be utilised with the total number of partitions of data matching
 the number of available cores. If the paritions are too large, then there will be idle cores. Conversely, if the
 partitions are too small then there will be unnecessary overheads from workers starting and stopping multiple times.
+See this diagram: [optimum-batching](MPAIO_optimum_batching_on_a_4_core_system.png)
 
 MPAIO is designed using dependency injection, so the executor and shared memory must be created in the user code and
 injected in when constructing the `WorkerOrchestrator`.
@@ -85,7 +86,11 @@ To run the examples:
     a. `python examples/example_runner.py`
 
 This will also produce a plot of the CPU utilisation from running the examples. You can change `n_workers` in 
-`example_runner.py` to see the effect os utilising fewer/more cores.
+`example_runner.py` to see the effect of utilising fewer/more cores.
+
+You can also experiment with switching out the `ProcessPoolExecutor` with a `ThreadPoolExecutor`. Note that despite the
+limitations of the GIL, since some numpy calls and third party libraries release the GIL under the hood, performance
+benefits can be seen from using multithreading.
 
 ## Implementation Notes
 Use data structures created by multiprocess
@@ -102,9 +107,6 @@ child/parent process is writing to the shared memory dynamically.
 
 Seems tempting to implement as a decorator but this design won't work well when orchestrating multiple workers
 with different processing requirements. There's also issues with pickle when attempting to pickle a decorated method.
-
-Since some numpy calls and third party libraries release the GIL under the hood, performance benefits can be seen from
-using multithreading.
 
 Option when designing this to register the worker functions using a decorator e.g.
 
@@ -125,10 +127,8 @@ worker until the process manager is run.
 
 Uses structured concurrency (anyio) for TaskGroup like task management without having to restrict to Python 3.11.
 
-Use chatgpt for writing unit tests. This is a good litmus test for having small modular classes. ChatGPT generates
-excellent tests for small, well designed simple classes whereas it struggles to test complex spaghetti classes.
-
 Use a mix of anyio and asyncio
 anyio - excellent library for structured concurrency, gives you task groups without having to be on Python 3.11. It does
 not yet have support for synchronisation primitives for multi processing.
 asyncio - run concurrent executor within asyncio.
+

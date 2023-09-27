@@ -12,14 +12,10 @@ map SHM.block2 {
 }
 map SHM.block3 {
 }
-map core.0 {
+map user {
+event loop running in main process\nawaits the output of the workers =>
 }
-map core.1 {
-}
-map core.2 {
-}
-map core.3 {
-}
+
 map worker.0 {
 }
 map worker.1 {
@@ -29,14 +25,19 @@ map worker.2 {
 map worker.3 {
 }
 
-SHM.block0 <-- core.0 : process
-SHM.block1 <-- core.1 : process
-SHM.block2 <-- core.2 : process
-SHM.block3 <-- core.3 : process
+SHM.block0 <-- worker.0 : process
+SHM.block1 <-- worker.1 : process
+SHM.block2 <-- worker.2 : process
+SHM.block3 <-- worker.3 : process
 
-core.0 --> worker.0 : process_callback
-core.1 --> worker.1 : process_callback
-core.2 --> worker.2 : process_callback
-core.3 --> worker.3 : process_callback
+worker.0 --> worker.0 : core-0
+worker.1 --> worker.1 : core-1
+worker.2 --> worker.2 : core-2
+worker.3 --> worker.3 : core-3
+
+worker.0 --> user : process_callback
+worker.1 --> user : process_callback
+worker.2 --> user : process_callback
+worker.3 --> user : process_callback
 
 @enduml
